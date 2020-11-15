@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
+const Article = require('./models/article');
+const articleRouter = require('./routes/index');
 
 const app = express();
 
@@ -57,9 +59,19 @@ app.use(function(req, res, next) {
   next();
 });
 
-//Routes
-app.use('/', require('./routes/index.js'));
-app.use('/users', require('./routes/user.js'));
+//Routers
+app.use('/', require('./routes/index'));
+app.use('/users', require('./routes/user'));
+
+app.get('/', async (req, res, next) => {
+  const articles = await Article.find().sort({ createdAt: 'desc' })
+  res.render('dashboard/index', { articles: articles })
+  next();
+})
+
+app.use('/dashboard', articleRouter)
+
+app.use(express.static(__dirname + '/'));
 
 const PORT = process.env.PORT || 5001;
 

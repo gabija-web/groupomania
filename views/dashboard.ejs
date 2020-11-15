@@ -1,3 +1,16 @@
-<h1 class="mt-4">Groupomania blog</h1>
+<h1 class="mt-4"><i class="fas fa-globe"></i>Groupomania blog</h1>
 <p class="lead mb-3">Welcome <%= name %></p>
 <a href="/users/logout" class="btn btn-secondary">Logout</a>
+<a href="/new" class="btn btn-success">New Article</a>
+<% articles.forEach(article => { %>
+  <div class="card mt-4">
+    <div class="card-body">
+      <h4 class="card-title"><%= article.title %></h4>
+      <div class="card-subtitle text-muted mb-2">
+        <%= article.createdAt.toLocaleDateString() %>
+      </div>
+      <div class="card-text mb-2"><%= article.description %></div>
+      <a href="dashboard/<%= article.slug %>" class="btn btn-primary">Read More</a>
+    </div>
+  </div>
+<% }) %>

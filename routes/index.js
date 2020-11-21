@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated} = require('../config/auth');
 const Article = require('./../models/article');
-const slug = require('slug');
-const slugify = require('slugify');
 
 //main page
 router.get('/', (req, res) => res.render('welcome'));
@@ -44,14 +42,13 @@ router.get('/new', (req, res) => {
       article.title = req.body.title
       article.description = req.body.description
       article.markdown = req.body.markdown
-      article.slug = req.params.slug
       try {
         article = await article.save(function(err) {
         if(err) {
           console.log(err);
           return;
         } else {
-          res.redirect(`/dashboard/${article.slug}`)
+          res.redirect(`/dashboard`)
         }
       })
         

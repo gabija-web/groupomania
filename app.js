@@ -5,7 +5,12 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
 const Article = require('./models/article');
-const articleRouter = require('./routes/index');
+const methodOverride = require('method-override');
+const { patch } = require('./routes');
+const bodyParser = require('body-parser');
+const path = require('path');
+const slug = require('slug');
+const slugify = require('slugify');
 
 const app = express();
 
@@ -32,10 +37,15 @@ mongoose.connect(
 
 //EJS
 app.use(expressLayouts);
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 //Bodyparser
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false}));
+
+app.use(methodOverride('_method'));
 
 // express session middleware
 app.use(session({
@@ -62,14 +72,6 @@ app.use(function(req, res, next) {
 //Routers
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/user'));
-
-app.get('/', async (req, res, next) => {
-  const articles = await Article.find().sort({ createdAt: 'desc' })
-  res.render('dashboard/index', { articles: articles })
-  next();
-})
-
-app.use('/dashboard', articleRouter)
 
 app.use(express.static(__dirname + '/'));
 

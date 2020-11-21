@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated} = require('../config/auth');
-const Article = require('../models/article');
+const Article = require('./../models/article');
+const slug = require('slug');
+const slugify = require('slugify');
 
 //main page
 router.get('/', (req, res) => res.render('welcome'));
@@ -10,14 +12,15 @@ router.get('/', (req, res) => res.render('welcome'));
 router.get('/dashboard', ensureAuthenticated, (req, res) => {
   Article.find().then(
     (articles) => {
-      console.log(res);
+      // console.log(res);
       res.render('dashboard', {
         name: req.user.name,
         articles: articles
     })
-    }).catch(()=>{}) 
+    }).catch(()=>{})
+ 
 })
-    
+
 //articles
 router.get('/new', (req, res) => {
     res.render('new', { article: new Article() })
@@ -25,14 +28,15 @@ router.get('/new', (req, res) => {
   
   router.get('/:slug', async (req, res) => {
     const article = await Article.findOne({ slug: req.params.slug })
-    if (article == null) res.redirect('/')
+    if (article == null) res.redirect('/dashboard')
     res.render('show', { article: article })
   })
   
-  router.post('/', async (req, res, next) => {
+  router.post('/dashboard', async (req, res, next) => {
     req.article = new Article()
     next()
   }, saveArticleAndRedirect('new'))
+  
   
   function saveArticleAndRedirect(path) {
     return async (req, res) => {
@@ -40,9 +44,17 @@ router.get('/new', (req, res) => {
       article.title = req.body.title
       article.description = req.body.description
       article.markdown = req.body.markdown
+      article.slug = req.params.slug
       try {
-        article = await article.save()
-        res.redirect(`/articles/${article.slug}`)
+        article = await article.save(function(err) {
+        if(err) {
+          console.log(err);
+          return;
+        } else {
+          res.redirect(`/dashboard/${article.slug}`)
+        }
+      })
+        
       } catch (e) {
         res.render(`${path}`, { article: article })
       }

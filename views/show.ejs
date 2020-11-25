@@ -17,9 +17,11 @@
 <div class="card mt-4">
   <div class="card-body">
     <div class="form-group">
-      <textarea name="comment" id="comment" class="form-control"></textarea>
+      <h1 class="mt-4"><i class="far fa-comments mr-2"></i>Comments</h1>
+      <textarea required name="comment" id="comment" class="form-control"><%= comment %></textarea>
     </div>
     <div>
+      <form action="/dashboard" method="POST"></form>
       <button type="submit" class="btn btn-primary">Comment</button>
     </div>
   </div>

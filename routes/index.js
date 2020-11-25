@@ -27,7 +27,7 @@ router.get('/new', (req, res) => {
   router.get('/:slug', async (req, res) => {
     const article = await Article.findOne({ slug: req.params.slug })
     if (article == null) res.redirect('/dashboard')
-    res.render('show', { article: article })
+    res.render('show', { article: article, comment: req.body.comment })
   })
   
   router.post('/dashboard', async (req, res, next) => {
@@ -59,6 +59,31 @@ router.get('/new', (req, res) => {
   }
 
   //comment 
+  router.post('/dashboard', async (req, res, next) => {
+    req.comment = new Comment()
+    next()
+    console.log(req.body.comment)
+  }, saveCommentAndRedirect('new'))
+
+  function saveCommentAndRedirect(path) {
+    return async (req, res) => {
+      let comment = req.comment
+      comment = req.body.comment
+      try {
+        comment = await comment.save(function(err) {
+        if(err) {
+          console.log(err);
+          return;
+        } else {
+          res.redirect(`/dashboard`)
+        }
+      })
+        
+      } catch (e) {
+        res.render(`${path}`, { comment: req.body.comment })
+      }
+    }
+  }  
 
 
 module.exports = router;

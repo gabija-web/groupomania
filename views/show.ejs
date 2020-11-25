@@ -1,11 +1,26 @@
-<div class="container">
-  <h1 class="mb-1"><%= article.title %></h1>
-  <div class="text-muted mb-2">
+<div class="card mt-4">
+  <div class="card-body">
+  <h1 class="mb-2 mt-2"><%= article.title %></h1>
+  <div class="text-muted mb-2 inline">
     <%= article.createdAt.toLocaleDateString() %>
   </div>
+  <style type="text/css">
+     .btn-secondary { background: #bb8e5a !important; }
+ </style>
     <a href="/dashboard" class="btn btn-secondary">All Articles</a>
     <p class="mb-15"></p>
   <div>
     <%- article.sanitizedHtml %>
+  </div>
+  </div>
+</div>
+<div class="card mt-4">
+  <div class="card-body">
+    <div class="form-group">
+      <textarea name="comment" id="comment" class="form-control"></textarea>
+    </div>
+    <div>
+      <button type="submit" class="btn btn-primary">Comment</button>
+    </div>
   </div>
 </div>

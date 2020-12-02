@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated} = require('../config/auth');
 const { db } = require('./../models/article');
-const mongoose = require('mongoose');
-const Comments = require('./../models/comment');
+const Comment = require('./../models/comment');
 const Article = require('./../models/article');
-// const db = require('./config/keys').MongoURI;
+const ObjectId = require('mongodb').ObjectID;
 
 //main page
 router.get('/', (req, res) => res.render('welcome'));
@@ -63,23 +62,22 @@ router.get('/new', (req, res) => {
 
 //Comments 
 
-
-
 router.post("/:slug", function (req, res) {
   console.log(req.body.article_id)
   console.log(req.body.username)
   console.log(req.body.comment)
-  var ObjectId = require('mongodb').ObjectID;
-  // mongoose.connect(url, function (error, client) => {
   db.collection("articles").update({"_id":ObjectId(req.body.article_id)}, {
     $push: {
       "comments": {username: req.body.username, comment: req.body.comment}
     }
-  }, function (error, post) {
-    res.send("comment successfull");
-    // res.redirect(`/:slug`)
+  }, function (error) {
+    if(error) {
+      console.log(error);
+      return;
+    } else {
+      res.redirect(`/dashboard`);
+    }
   });
-// })
 });
   
 module.exports = router;

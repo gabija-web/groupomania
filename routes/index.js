@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { ensureAuthenticated} = require('../config/auth');
+const { db } = require('./../models/article');
+const mongoose = require('mongoose');
+const Comments = require('./../models/comment');
 const Article = require('./../models/article');
+// const db = require('./config/keys').MongoURI;
 
 //main page
 router.get('/', (req, res) => res.render('welcome'));
@@ -16,7 +20,6 @@ router.get('/dashboard', ensureAuthenticated, (req, res) => {
         articles: articles
     })
     }).catch(()=>{})
- 
 })
 
 //articles
@@ -27,7 +30,7 @@ router.get('/new', (req, res) => {
   router.get('/:slug', async (req, res) => {
     const article = await Article.findOne({ slug: req.params.slug })
     if (article == null) res.redirect('/dashboard')
-    res.render('show', { article: article, comment: req.body.comment })
+    res.render('show', { article: article, comment: req.body.comment, username: req.body.username })
   })
   
   router.post('/dashboard', async (req, res, next) => {
@@ -58,32 +61,25 @@ router.get('/new', (req, res) => {
     }
   }
 
-  //comment 
-  router.post('/dashboard', async (req, res, next) => {
-    req.comment = new Comment()
-    next()
-    console.log(req.body.comment)
-  }, saveCommentAndRedirect('new'))
+//Comments 
 
-  function saveCommentAndRedirect(path) {
-    return async (req, res) => {
-      let comment = req.comment
-      comment = req.body.comment
-      try {
-        comment = await comment.save(function(err) {
-        if(err) {
-          console.log(err);
-          return;
-        } else {
-          res.redirect(`/dashboard`)
-        }
-      })
-        
-      } catch (e) {
-        res.render(`${path}`, { comment: req.body.comment })
-      }
+
+
+router.post("/:slug", function (req, res) {
+  console.log(req.body.article_id)
+  console.log(req.body.username)
+  console.log(req.body.comment)
+  var ObjectId = require('mongodb').ObjectID;
+  // mongoose.connect(url, function (error, client) => {
+  db.collection("articles").update({"_id":ObjectId(req.body.article_id)}, {
+    $push: {
+      "comments": {username: req.body.username, comment: req.body.comment}
     }
-  }  
-
-
+  }, function (error, post) {
+    res.send("comment successfull");
+    // res.redirect(`/:slug`)
+  });
+// })
+});
+  
 module.exports = router;

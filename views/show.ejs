@@ -14,15 +14,53 @@
   </div>
   </div>
 </div>
-<div class="card mt-4">
+<!-- Comment form -->
+<div class="card my-4">
+  <h5 class="card-header"><i class="far fa-comments mr-2"></i>Leave a Comment</h5>
   <div class="card-body">
-    <div class="form-group">
-      <h1 class="mt-4"><i class="far fa-comments mr-2"></i>Comments</h1>
-      <textarea required name="comment" id="comment" class="form-control"><%= comment %></textarea>
-    </div>
-    <div>
-      <form action="/dashboard" method="POST"></form>
-      <button type="submit" class="btn btn-primary">Comment</button>
+    <form method="POST" onsubmit="return doComment(this);">
+      <input type="hidden" name="article_id" value="<%= article._id %>" />
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input class="form-control" required name="username"/>
+      </div>
+      <div class="form-group">
+        <label for="comment">Comment</label>
+        <textarea class="form-control" required name="comment" rows="3"></textarea>
+      </div>
+      <button type="submit" class=" btn btn-primary">Submit</button>
+    </form>
+
+    <script>
+      function doComment(form) {
+        $.ajax({
+          url: "/:slug",
+          method: "POST",
+          data: {usename: form.username.value, comment: form.comment.value, article_id: form.article_id.value},
+          success: function(response) {
+            alert(response);
+          }
+        });
+        return false;
+      }
+    </script>
+
+    <!-- Single comment -->
+    <div class="card-body">
+      <% if (article.comments) { %>
+        <% article.comments = article.comments.reverse() %>
+        <% article.comments.forEach(function (comment) { %>
+          <div class="media mb-4">
+            <img class="d-flex mt-2 mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+            <div class="media-body">
+              <h5 class="mt-2">
+                <%= comment.username %>
+              </h5>
+              <%= comment.comment %>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
     </div>
   </div>
 </div>

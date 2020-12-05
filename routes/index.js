@@ -26,10 +26,14 @@ router.get('/new', (req, res) => {
     res.render('new', { article: new Article() })
   })
   
-  router.get('/:slug', async (req, res) => {
-    const article = await Article.findOne({ slug: req.params.slug })
-    if (article == null) res.redirect('/dashboard')
-    res.render('show', { article: article, comment: req.body.comment, username: req.body.username })
+  router.get('/:slug',  (req, res) => {
+     Article.findOne({ slug: req.params.slug }).then( (article)=>{
+    	if(article == null){ return res.redirect('/dashboard') }else{
+	return res.render('show',{ article: article})    }
+    
+    }).catch((err)=>{
+    	console.log(err)
+    })
   })
   
   router.post('/dashboard', async (req, res, next) => {
@@ -66,7 +70,8 @@ router.post("/:slug", function (req, res) {
   console.log(req.body.article_id)
   console.log(req.body.username)
   console.log(req.body.comment)
-  db.collection("articles").update({"_id":ObjectId(req.body.article_id)}, {
+
+   db.collection("articles").updateOne({"_id":ObjectId(req.body.article_id)}, {
     $push: {
       "comments": {username: req.body.username, comment: req.body.comment}
     }
@@ -75,7 +80,7 @@ router.post("/:slug", function (req, res) {
       console.log(error);
       return;
     } else {
-      res.redirect(`/dashboard`);
+       return res.redirect(`/`+req.params.slug);
     }
   });
 });

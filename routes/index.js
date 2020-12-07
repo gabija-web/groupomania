@@ -11,7 +11,7 @@ router.get('/', (req, res) => res.render('welcome'));
 
 //dashboard
 router.get('/dashboard', ensureAuthenticated, (req, res) => {
-  Article.find().then(
+  Article.find().sort({createdAt: 'desc'}).then(
     (articles) => {
       // console.log(res);
       res.render('dashboard', {
